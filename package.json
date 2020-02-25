@@ -1,6 +1,6 @@
 {
   "name": "react-native-maps-super-cluster",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A Clustering-enabled map for React Native",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/novalabio/react-native-maps-super-cluster.git"
+    "url": "git+https://github.com/deniscreamer/react-native-maps-super-cluster.git"
   },
   "keywords": [
     "react",
@@ -28,9 +28,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/novalabio/react-native-maps-super-cluster/issues"
+    "url": "https://github.com/deniscreamer/react-native-maps-super-cluster/issues"
   },
-  "homepage": "https://github.com/novalabio/react-native-maps-super-cluster#readme",
+  "homepage": "https://github.com/deniscreamer/react-native-maps-super-cluster#readme",
   "dependencies": {
     "@mapbox/geo-viewport": "^0.4.0",
     "supercluster": "^7.0.0"
