@@ -1,19 +1,30 @@
-# React Native Super Cluster
+# React Native Super Cluster 
+# FORKED for enhance perfomance work with a large length markers (2000+, 5000+ , 10000+)
 This module wraps [AirBnB's react-native-maps](https://github.com/airbnb/react-native-maps) and uses [MapBox's SuperCluster](https://github.com/mapbox/supercluster) as clustering engine.
+
+**Forked**
+- fix warnings (remove old RN lifecycles)
+- update react-native-maps to 0.26.1 (last version used by Expo)
+- dynamic extent (one of options from SuperCluster engine)
+- use shouldComponentUpdate for optimisation re-renders
+
+<center>
+<img src="https://imagizer.imageshack.com/img924/9168/8alMh4.jpg">
+</center>
 
 ## Example
 
-[See the showcase application](https://github.com/novalabio/react-native-maps-super-cluster-example).
-
-<center>
-<img src="https://github.com/novalabio/react-native-maps-super-cluster-example/blob/master/assets/demo.gif?raw=true" width="240">
-</center>
+[See the showcase application (novalabio)](https://github.com/novalabio/react-native-maps-super-cluster-example).
 
 ## Rationale
 This module wants to provide a stable and performing solution for maps clustering in React Native. In particular, our efforts are focused on integrating SuperCluster methods into React's state/lifecycle events, ensuring stability, compatibility and great performance.
 
 ## Install
+**Original Novalabio**
 `npm i --save react-native-maps-super-cluster`
+
+**Forked**
+`yarn add https://github.com/deniscreamer/react-native-maps-super-cluster.git`
 
 ## Usage
 
