@@ -62,7 +62,7 @@ export default class ClusteredMapView extends Component {
   } */
   
   componentDidUpdate(prevProps, prevState) {
-    if (this.props.data !== prevProps.data) {
+    if (this.props.data.length !== prevProps.data.length) {
       const currentZoom = calcZoom(this.state.region.longitudeDelta);
       this.clusterize(this.props.data, generateExtentByCount(currentZoom, !!this.props.data ? this.props.data.length : 0))
     }
