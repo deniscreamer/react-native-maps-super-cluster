@@ -96,3 +96,24 @@ export const itemToGeoJSONFeature = (item, accessor) => {
     properties: { point_count: 0, item } // eslint-disable-line camelcase
   }
 }
+
+export const calcZoom = (longitudeDelta) => {
+  // Omit rounding intentionally for the example
+  return Math.round(Math.log(360 / longitudeDelta) / Math.LN2)
+}
+
+export const generateExtentByCount = (currentZoom, markersLength) => {
+  if (markersLength <= 2000) {
+    return currentZoom <= 14 ? 150 : currentZoom >= 15 ? 250 : 150;
+  } else if (markersLength <= 4000) {
+    return currentZoom <= 14 ? 145 : currentZoom >= 15 ? 250 : 145;
+  } else if (markersLength <= 6000) {
+    return currentZoom <= 14 ? 130 : currentZoom >= 15 ? 250 : 130;
+  } else if (markersLength <= 8000) {
+    return currentZoom <= 14 ? 115 : currentZoom >= 15 ? 250 : 115;
+  } else {
+    return currentZoom <= 14 ? 100 : currentZoom >= 15 ? 250 : 100;
+  }
+  /* if (currentZoom <= 14 && this.index.options.extent !== 150) {
+  } else if (currentZoom >= 15 && this.index.options.extent !== 250) { */
+}

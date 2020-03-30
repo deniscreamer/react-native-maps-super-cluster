@@ -2,7 +2,7 @@
 
 // base libs
 import PropTypes from 'prop-types'
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import {
   Platform,
   Dimensions,
@@ -19,9 +19,11 @@ import {
   regionToBoundingBox,
   itemToGeoJSONFeature,
   getCoordinatesFromItem,
+  calcZoom,
+  generateExtentByCount,
 } from './util'
 
-export default class ClusteredMapView extends PureComponent {
+export default class ClusteredMapView extends Component {
 
   constructor(props) {
     super(props)
@@ -38,20 +40,38 @@ export default class ClusteredMapView extends PureComponent {
     this.onClusterPress = this.onClusterPress.bind(this)
     this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this)
   }
+  
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.data && nextProps.data && this.props.data.length !== nextProps.data.length) {
+      return true
+    }
+    if (this.state.data && nextState.data && this.state.data.length !== nextState.data.length) {
+      return true
+    }
+    return false;
+  }
 
   componentDidMount() {
     this.clusterize(this.props.data)
   }
-
-  componentWillReceiveProps(nextProps) {
+/* 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    console.log('updateprops ', nextProps, this.props)
     if (this.props.data !== nextProps.data)
       this.clusterize(nextProps.data)
+  } */
+  
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.data !== prevProps.data) {
+      const currentZoom = calcZoom(this.state.region.longitudeDelta);
+      this.clusterize(this.props.data, generateExtentByCount(currentZoom, !!this.props.data ? this.props.data.length : 0))
+    }
   }
-
-  componentWillUpdate(nextProps, nextState) {
+  
+  /* componentWillUpdate(nextProps, nextState) {
     if (!this.isAndroid && this.props.animateClusters && this.clustersChanged(nextState))
       LayoutAnimation.configureNext(this.props.layoutAnimationConf)
-  }
+  } */
 
   mapRef(ref) {
     this.mapview = ref
@@ -65,12 +85,13 @@ export default class ClusteredMapView extends PureComponent {
     return this.index
   }
 
-  clusterize(dataset) {
+  clusterize(dataset, extent = this.props.extent, region = this.state.region, cb) {
     this.index = new SuperCluster({ // eslint-disable-line new-cap
-      extent: this.props.extent,
+      extent: extent,
       minZoom: this.props.minZoom,
       maxZoom: this.props.maxZoom,
       radius: this.props.radius || (this.dimensions[0] * .045), // 4.5% of screen width
+      nodeSize: 512,
     })
 
     // get formatted GeoPoints for cluster
@@ -79,19 +100,37 @@ export default class ClusteredMapView extends PureComponent {
     // load geopoints into SuperCluster
     this.index.load(rawData)
 
-    const data = this.getClusters(this.state.region)
-    this.setState({ data })
+    const data = this.getClusters(region)
+    this.setState({ data, region }, cb ? () => cb(data) : () => {});
   }
 
-  clustersChanged(nextState) {
-    return this.state.data.length !== nextState.data.length
+  clustersChanged(newData) {
+    return this.state.data.length !== newData.length
+  }
+
+  generateClustersByRegion(region) {
+    let data = this.getClusters(region);
+    this.setState({ region, data }, () => {
+    this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)});
   }
 
   onRegionChangeComplete(region) {
-    let data = this.getClusters(region)
-    this.setState({ region, data }, () => {
-        this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)
-    })
+    const currentZoom = calcZoom(region.longitudeDelta);
+    const oldZoom = calcZoom(this.state.region.longitudeDelta);
+    const currentExtent = this._getCurrentExtent();
+    const newExtent = generateExtentByCount(currentZoom, this._getDataLength());
+    if (currentZoom !== oldZoom) {
+      if (!!newExtent && currentExtent !== newExtent) {
+          this.clusterize(this.props.data, newExtent, region, (data) => {
+            this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)
+          })
+      } else {
+        this.generateClustersByRegion(region);
+      }
+    } else {
+      this.generateClustersByRegion(region);
+    }
+    
   }
 
   getClusters(region) {
@@ -124,9 +163,16 @@ export default class ClusteredMapView extends PureComponent {
     this.props.onClusterPress && this.props.onClusterPress(cluster.properties.cluster_id, markers)
   }
 
+  _getDataLength() {
+    return this.props.data.length;
+  }
+
+  _getCurrentExtent() {
+    return this.index.options.extent;
+  }
+
   render() {
     const { style, ...props } = this.props
-
     return (
       <MapView
         {...props}
