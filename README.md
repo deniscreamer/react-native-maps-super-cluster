@@ -20,7 +20,11 @@ This module wraps [AirBnB's react-native-maps](https://github.com/airbnb/react-n
 This module wants to provide a stable and performing solution for maps clustering in React Native. In particular, our efforts are focused on integrating SuperCluster methods into React's state/lifecycle events, ensuring stability, compatibility and great performance.
 
 ## Install
+**Original Novalabio**
 `npm i --save react-native-maps-super-cluster`
+
+**Forked**
+`yarn add https://github.com/deniscreamer/react-native-maps-super-cluster.git`
 
 ## Usage
 
