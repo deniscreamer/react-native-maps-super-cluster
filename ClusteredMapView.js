@@ -91,7 +91,7 @@ export default class ClusteredMapView extends Component {
       minZoom: this.props.minZoom,
       maxZoom: this.props.maxZoom,
       radius: this.props.radius || (this.dimensions[0] * .045), // 4.5% of screen width
-      nodeSize: 512,
+      nodeSize: 64,
     })
 
     // get formatted GeoPoints for cluster
