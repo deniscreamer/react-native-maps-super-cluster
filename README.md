@@ -7,6 +7,8 @@ This module wraps [AirBnB's react-native-maps](https://github.com/airbnb/react-n
 - update react-native-maps to 0.26.1 (last version used by Expo)
 - dynamic extent (one of options from SuperCluster engine)
 - use shouldComponentUpdate for optimisation re-renders
+- add new prop for cluster-markers **adsId** when current zoom >= 15
+- add prop function for show loader **onToggleLoading(true/false)**
 
 <center>
 <img src="https://imagizer.imageshack.com/img924/9168/8alMh4.jpg">

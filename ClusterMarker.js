@@ -11,20 +11,32 @@ export default class ClusterMarker extends Component {
     this.onPress = this.onPress.bind(this)
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.type !== this.props.type) {
+      return true;
+    }
+    if (nextProps.id !== this.props.id) {
+      return true;
+    }
+    return false;
+  }
+
   onPress() {
     this.props.onPress(this.props)
   }
 
   render() {
-    const pointCount = this.props.properties.point_count // eslint-disable-line camelcase
-    const latitude = this.props.geometry.coordinates[1],
-          longitude = this.props.geometry.coordinates[0]
-
+    const clusterId = this.props.properties.cluster_id;
+    const pointCount = this.props.properties.point_count; // eslint-disable-line camelcase
+    const [longitude, latitude] = this.props.geometry.coordinates;
+    const adsId = this.props.getAdsByClusterId(clusterId, pointCount);
+    
     if (this.props.renderCluster) {
       const cluster = {
         pointCount,
         coordinate: { latitude, longitude },
-        clusterId: this.props.properties.cluster_id,
+        clusterId,
+        adsId
       }
       return this.props.renderCluster(cluster, this.onPress)
     }

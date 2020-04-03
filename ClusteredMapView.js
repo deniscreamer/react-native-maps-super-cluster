@@ -38,7 +38,8 @@ export default class ClusteredMapView extends Component {
 
     this.mapRef = this.mapRef.bind(this)
     this.onClusterPress = this.onClusterPress.bind(this)
-    this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this)
+    this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
+    this.getAdsByClusterId = this.getAdsByClusterId.bind(this);
   }
   
   shouldComponentUpdate(nextProps, nextState) {
@@ -112,25 +113,28 @@ export default class ClusteredMapView extends Component {
     let data = this.getClusters(region);
     this.setState({ region, data }, () => {
     this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)});
+    this.props.onToggleLoading && this.props.onToggleLoading(false);
   }
 
   onRegionChangeComplete(region) {
-    const currentZoom = calcZoom(region.longitudeDelta);
-    const oldZoom = calcZoom(this.state.region.longitudeDelta);
-    const currentExtent = this._getCurrentExtent();
-    const newExtent = generateExtentByCount(currentZoom, this._getDataLength());
-    if (currentZoom !== oldZoom) {
-      if (!!newExtent && currentExtent !== newExtent) {
-          this.clusterize(this.props.data, newExtent, region, (data) => {
-            this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)
-          })
+    this.props.onToggleLoading && this.props.onToggleLoading(true);
+    setTimeout(() => {
+      const currentZoom = calcZoom(region.longitudeDelta);
+      const oldZoom = calcZoom(this.state.region.longitudeDelta);
+      const currentExtent = this._getCurrentExtent();
+      const newExtent = generateExtentByCount(currentZoom, this._getDataLength());
+      if (currentZoom !== oldZoom) {
+        if (!!newExtent && currentExtent !== newExtent) {
+            this.clusterize(this.props.data, newExtent, region, (data) => {
+              this.props.onRegionChangeComplete && this.props.onRegionChangeComplete(region, data)
+            })
+        } else {
+          this.generateClustersByRegion(region);
+        }
       } else {
         this.generateClustersByRegion(region);
       }
-    } else {
-      this.generateClustersByRegion(region);
-    }
-    
+      }, 10);
   }
 
   getClusters(region) {
@@ -138,6 +142,16 @@ export default class ClusteredMapView extends Component {
           viewport = (region.longitudeDelta) >= 40 ? { zoom: this.props.minZoom } : GeoViewport.viewport(bbox, this.dimensions)
 
     return this.index.getClusters(bbox, viewport.zoom)
+  }
+
+  getAdsByClusterId(clusterId, pointCount) {
+    if (this._getCurrentZoom() >= 15) {
+      return this.index.getLeaves(clusterId, pointCount)
+        .map(item => item.properties)
+        .map(item => item.item);
+    } else {
+      return [];
+    }
   }
 
   onClusterPress(cluster) {
@@ -171,6 +185,10 @@ export default class ClusteredMapView extends Component {
     return this.index.options.extent;
   }
 
+  _getCurrentZoom() {
+    return calcZoom(this.mapview.__lastRegion.longitudeDelta)
+  }
+
   render() {
     const { style, ...props } = this.props
     return (
@@ -188,6 +206,7 @@ export default class ClusteredMapView extends Component {
               <ClusterMarker
                 {...d}
                 onPress={this.onClusterPress}
+                getAdsByClusterId={this.getAdsByClusterId}
                 renderCluster={this.props.renderCluster}
                 key={`cluster-${d.properties.cluster_id}`} />
             )
