@@ -55,7 +55,8 @@ export default class MyClusteredMapView extends Component {
   renderCluster = (cluster, onPress) => {
     const pointCount = cluster.pointCount,
           coordinate = cluster.coordinate,
-          clusterId = cluster.clusterId
+          clusterId = cluster.clusterId,
+          adsId = cluster.adsId;
 
     // use pointCount to calculate cluster size scaling
     // and apply it to "style" prop below
@@ -63,8 +64,9 @@ export default class MyClusteredMapView extends Component {
     // eventually get clustered points by using
     // underlying SuperCluster instance
     // Methods ref: https://github.com/mapbox/supercluster
-    const clusteringEngine = this.map.getClusteringEngine(),
-          clusteredPoints = clusteringEngine.getLeaves(clusterId, 100)
+    
+    //const clusteringEngine = this.map.getClusteringEngine(),
+    //      clusteredPoints = clusteringEngine.getLeaves(clusterId, 100)
 
     return (
       <Marker coordinate={coordinate} onPress={onPress}>
@@ -106,7 +108,9 @@ export default class MyClusteredMapView extends Component {
         initialRegion={INIT_REGION}
         ref={(r) => { this.map = r }}
         renderMarker={this.renderMarker}
-        renderCluster={this.renderCluster} />
+        renderCluster={this.renderCluster}
+        onToggleLoading={(isLoading) => {}}
+        />
     )
   }
 }
@@ -116,6 +120,7 @@ export default class MyClusteredMapView extends Component {
 
 **Name** | **Type** | **Required** | **Default** | **Note**
 ---------|----------|--------------|-------------|---------
+onToggleLoading(isLoading) | Function(bool) | false | undefined | Toogle start/stop loading markers.
 radius | Number | false | window width * 4,5% | [SuperCluster radius](https://github.com/mapbox/supercluster#options).
 extent | Number | false | 512 | [SuperCluster extent](https://github.com/mapbox/supercluster#options).
 minZoom | Number | false | 1 | [SuperCluster minZoom](https://github.com/mapbox/supercluster#options).
