@@ -211,6 +211,7 @@ export default class ClusteredMapView extends Component {
         // fit right around them, considering edge padding
         this.mapview.fitToCoordinates(coordinates, {
             edgePadding: this.props.edgePadding,
+            animated: !this.isAndroid,
         });
 
         this.props.onClusterPress &&
