@@ -33,10 +33,10 @@
   "homepage": "https://github.com/deniscreamer/react-native-maps-super-cluster#readme",
   "dependencies": {
     "@mapbox/geo-viewport": "^0.4.0",
-    "supercluster": "^7.0.0"
+    "supercluster": "^7.1.0"
   },
   "peerDependencies": {
     "prop-types": "15.7.2",
-    "react-native-maps": "^0.26.1"
+    "react-native-maps": "^0.27.1"
   }
 }
